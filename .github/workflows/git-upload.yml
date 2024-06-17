@@ -1,0 +1,29 @@
+name: Create Archive
+on: 
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'tags to create build'
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions: write-all
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: main
+    - name: Run
+      run: |
+        git submodule update --init --recursive
+    - name: Archive Release 1
+      uses: thedoctor0/zip-release@0.7.5
+      with:
+        type: '7z'
+        path: 'output'
+        filename: 'output'
+    - name: create release and upload assets
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          output
+        tag_name: ${{ github.event.inputs.tags }}
